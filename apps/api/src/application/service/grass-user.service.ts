@@ -92,7 +92,7 @@ export class GrassUserService {
 					logger.warn(`Proxy ${proxy} for user ${userId} is invalid (no PONG received)`);
 					invalidProxies.push(proxy);
 					resolve();
-				}, 5000); // 5 секунд на ожидание PONG
+				}, 5000);
 
 				ws.once('pong', () => {
 					clearTimeout(timeout);
@@ -144,6 +144,7 @@ export class GrassUserService {
 			if (connections.length > 0) {
 				this.activeUsers.set(user.id, connections);
 			}
+			await new Promise(resolve => setTimeout(resolve, 30000));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GrassAccountConnector } from '../../infra/ws/grass-account/grass-account.connector';
 import { logger } from 'nx/src/utils/logger';
-import { ApiCreateUser } from '@dynastic-import-monorepository/contracts';
+import { ApiCreateUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
 import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api.find-all-user';
 import { PrismaService } from '../../infra/persistance/prisma/prisma.service';
 
@@ -39,17 +39,34 @@ export class GrassUserService {
 		}
 		if (connections.length > 0) {
 			this.activeUsers.set(userId, connections);
-      await this.prisma.grassUser.upsert({
-        where: { id: userId },
-        update: { proxies },
-        create: { id: userId, proxies },
-      });
+			await this.prisma.grassUser.upsert({
+				where: { id: userId },
+				update: { proxies },
+				create: { id: userId, proxies },
+			});
 			return { message: `User ${userId} added with ${connections.length} proxies.` };
 		} else {
 			throw new BadRequestException({
 				error: 'Failed to connect with provided proxies.',
 			});
 		}
+	}
+
+	public async parseProxies(body: string, userId: string): Promise<ApiParseUserProxy.Response> {
+		const proxyList = body
+			.split('\n')
+			.map((line) => line.trim())
+			.filter(Boolean);
+		if (proxyList.length === 0) {
+			throw new BadRequestException({
+				error: 'Empty proxy list',
+			});
+		}
+		const formattedProxies = proxyList.map((proxy) => `socks5://${proxy}`);
+		return {
+			userId,
+			proxies: formattedProxies,
+		};
 	}
 
 	public findAll(): ApiFindAllUser.Response {
@@ -106,7 +123,7 @@ export class GrassUserService {
 		}
 		userSessions.forEach((session) => session.ws.close());
 		this.activeUsers.delete(userId);
-    await this.prisma.grassUser.delete({ where: { id: userId } });
+		await this.prisma.grassUser.delete({ where: { id: userId } });
 		return {
 			message: `User ${userId} and all their proxies removed`,
 		};

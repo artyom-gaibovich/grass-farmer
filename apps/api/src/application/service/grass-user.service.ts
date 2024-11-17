@@ -3,12 +3,16 @@ import { GrassAccountConnector } from '../../infra/ws/grass-account/grass-accoun
 import { logger } from 'nx/src/utils/logger';
 import { ApiCreateUser } from '@dynastic-import-monorepository/contracts';
 import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api.find-all-user';
+import { PrismaService } from '../../infra/persistance/prisma/prisma.service';
 
 @Injectable()
 export class GrassUserService {
 	private activeUsers: Map<any, any>;
 
-	constructor(private readonly grassConnector: GrassAccountConnector) {
+	constructor(
+		private readonly prisma: PrismaService,
+		readonly grassConnector: GrassAccountConnector,
+	) {
 		this.activeUsers = new Map();
 	}
 
@@ -35,6 +39,11 @@ export class GrassUserService {
 		}
 		if (connections.length > 0) {
 			this.activeUsers.set(userId, connections);
+      await this.prisma.grassUser.upsert({
+        where: { id: userId },
+        update: { proxies },
+        create: { id: userId, proxies },
+      });
 			return { message: `User ${userId} added with ${connections.length} proxies.` };
 		} else {
 			throw new BadRequestException({
@@ -49,44 +58,46 @@ export class GrassUserService {
 		};
 	}
 
-  public async checkConnections(userId: string): Promise<{ validProxies: string[]; invalidProxies: string[] }> {
-    const userSessions = this.activeUsers.get(userId);
-    if (!userSessions) {
-      throw new NotFoundException({ error: 'User not found' });
-    }
+	public async checkConnections(
+		userId: string,
+	): Promise<{ validProxies: string[]; invalidProxies: string[] }> {
+		const userSessions = this.activeUsers.get(userId);
+		if (!userSessions) {
+			throw new NotFoundException({ error: 'User not found' });
+		}
 
-    const validProxies: string[] = [];
-    const invalidProxies: string[] = [];
+		const validProxies: string[] = [];
+		const invalidProxies: string[] = [];
 
-    const checkPromises = userSessions.map(({ proxy, ws }) => {
-      return new Promise<void>((resolve) => {
-        const timeout = setTimeout(() => {
-          logger.warn(`Proxy ${proxy} for user ${userId} is invalid (no PONG received)`);
-          invalidProxies.push(proxy);
-          resolve();
-        }, 5000); // 5 секунд на ожидание PONG
+		const checkPromises = userSessions.map(({ proxy, ws }) => {
+			return new Promise<void>((resolve) => {
+				const timeout = setTimeout(() => {
+					logger.warn(`Proxy ${proxy} for user ${userId} is invalid (no PONG received)`);
+					invalidProxies.push(proxy);
+					resolve();
+				}, 5000); // 5 секунд на ожидание PONG
 
-        ws.once('pong', () => {
-          clearTimeout(timeout);
-          logger.info(`Proxy ${proxy} for user ${userId} is valid`);
-          validProxies.push(proxy);
-          resolve();
-        });
+				ws.once('pong', () => {
+					clearTimeout(timeout);
+					logger.info(`Proxy ${proxy} for user ${userId} is valid`);
+					validProxies.push(proxy);
+					resolve();
+				});
 
-        try {
-          ws.ping();
-        } catch (err) {
-          clearTimeout(timeout);
-          invalidProxies.push(proxy);
-          resolve();
-        }
-      });
-    });
+				try {
+					ws.ping();
+				} catch (err) {
+					clearTimeout(timeout);
+					invalidProxies.push(proxy);
+					resolve();
+				}
+			});
+		});
 
-    await Promise.all(checkPromises);
+		await Promise.all(checkPromises);
 
-    return { validProxies, invalidProxies };
-  }
+		return { validProxies, invalidProxies };
+	}
 
 	public async delete(userId: string): Promise<{ message: string }> {
 		const userSessions = this.activeUsers.get(userId);
@@ -95,8 +106,27 @@ export class GrassUserService {
 		}
 		userSessions.forEach((session) => session.ws.close());
 		this.activeUsers.delete(userId);
+    await this.prisma.grassUser.delete({ where: { id: userId } });
 		return {
 			message: `User ${userId} and all their proxies removed`,
 		};
+	}
+
+	public async initializeUsers() {
+		const users = await this.prisma.grassUser.findMany();
+		for (const user of users) {
+			const connections = [];
+			for (const proxy of user.proxies as string[]) {
+				try {
+					const wsConnection = await this.grassConnector.connect(user.id, proxy);
+					connections.push({ proxy, ws: wsConnection });
+				} catch (err) {
+					logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id}`);
+				}
+			}
+			if (connections.length > 0) {
+				this.activeUsers.set(user.id, connections);
+			}
+		}
 	}
 }

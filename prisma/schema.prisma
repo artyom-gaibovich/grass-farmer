@@ -21,6 +21,6 @@ model GrassUser {
   created_at  DateTime? @default(now())
   updated_at  DateTime?
 
-  @@map("grass_user")
+  @@map("grass_users")
   @@schema("grass")
 }

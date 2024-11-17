@@ -12,6 +12,7 @@
         "build"
       ],
       "options": {
+        "inspect": true,
         "buildTarget": "api:build",
         "runBuildTargetDependencies": false
       },

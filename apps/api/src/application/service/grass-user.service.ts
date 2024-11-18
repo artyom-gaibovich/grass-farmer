@@ -129,33 +129,49 @@ export class GrassUserService {
 			message: `User ${userId} and all their proxies removed`,
 		};
 	}
+  private sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  private async retryConnect(userId: string, proxy: string, retries = 0): Promise<any> {
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY_MS = 2000;
+    try {
+      return await this.grassConnector.connect(userId, proxy);
+    } catch (err) {
+      if (retries < MAX_RETRIES) {
+        logger.warn(`Retrying connection for user: ${userId} via proxy: ${proxy}. Attempt ${retries + 1}`);
+        await this.sleep(RETRY_DELAY_MS * (retries + 1));
+        return this.retryConnect(userId, proxy, retries + 1);
+      } else {
+        logger.error(`Failed to connect for user: ${userId} after ${MAX_RETRIES} attempts`);
+        throw err;
+      }
+    }
+  }
 
-	public async initializeUsers() {
-    const users = await this.prisma.grassUser.findMany();
-
-    const limit = pLimit(1); // максимум 5 одновременных подключений
+  public async initializeUsers() {
+    const users = await this.prisma.grassUsers.findMany();
+    const limit = pLimit(5);
 
     const connectionPromises = users.map((user) =>
       limit(async () => {
         const connections = [];
-        for (const proxy of user.proxies as string[]) {
+        for (const proxy of user.proxies) {
           try {
-            const wsConnection = await this.grassConnector.connect(user.id
-              , proxy);
+            const wsConnection = await this.retryConnect(user.user_id, proxy);
             connections.push({ proxy, ws: wsConnection });
           } catch (err) {
-            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id
-            }`);
+            logger.error(`Failed to connect via proxy: ${proxy} for user: ${user.user_id}`);
           }
         }
 
         if (connections.length > 0) {
-          this.activeUsers.set(user.id, connections);
-          logger.info(`User ${user.id} connected with ${connections.length} proxies.`);
+          this.activeUsers.set(user.user_id, connections);
+          logger.info(`User ${user.user_id} connected with ${connections.length} proxies.`);
         }
       })
     );
 
     await Promise.all(connectionPromises);
-	}
+  }
 }

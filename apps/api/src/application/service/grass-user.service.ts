@@ -140,16 +140,18 @@ export class GrassUserService {
         const connections = [];
         for (const proxy of user.proxies as string[]) {
           try {
-            const wsConnection = await this.grassConnector.connect(user.user_id, proxy);
+            const wsConnection = await this.grassConnector.connect(user.id
+              , proxy);
             connections.push({ proxy, ws: wsConnection });
           } catch (err) {
-            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.user_id}`);
+            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id
+            }`);
           }
         }
 
         if (connections.length > 0) {
-          this.activeUsers.set(user.user_id, connections);
-          logger.info(`User ${user.user_id} connected with ${connections.length} proxies.`);
+          this.activeUsers.set(user.id, connections);
+          logger.info(`User ${user.id} connected with ${connections.length} proxies.`);
         }
       })
     );

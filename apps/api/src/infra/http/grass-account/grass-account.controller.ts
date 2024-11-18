@@ -7,6 +7,12 @@ import { ApiFindAllUser } from '../../../../../../libs/contracts/src/lib/api.fin
 export class GrassAccountController {
 	constructor(private grassUserService: GrassUserService) {}
 
+
+  @Get('init')
+  public async initUser() {
+    return await this.grassUserService.initializeUsers()
+  }
+
 	@Post('parse-proxies/:userId')
 	public async parseUserProxies(@Param('userId') userId: string, @Body() body: string, @Req() req: any): Promise<ApiParseUserProxy.Response> {
 		return await this.grassUserService.parseProxies(body, userId);

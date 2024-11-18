@@ -21,10 +21,4 @@ import { GrassUserService } from './application/service/grass-user.service';
 	controllers: [GrassAccountController],
 	providers: [],
 })
-export class AppModule implements OnModuleInit {
-	constructor(private readonly grassUserService: GrassUserService) {}
-
-	async onModuleInit(): Promise<void> {
-		await this.grassUserService.initializeUsers();
-	}
-}
+export class AppModule {}

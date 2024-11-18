@@ -144,7 +144,6 @@ export class GrassUserService {
 			if (connections.length > 0) {
 				this.activeUsers.set(user.id, connections);
 			}
-			await new Promise(resolve => setTimeout(resolve, 240 * 1000));
 		}
 	}
 }

@@ -1,0 +1,30 @@
+import { Module } from '@nestjs/common';
+import { TelegramBotController } from '../../infra/http/telegram-bot/telegram-bot.controller';
+import { UseCasesEnum } from './use-cases.enum';
+import { StartUseCase } from './start/start';
+import { ActivateProxyUseCase } from './activate-proxy/activate-proxy';
+import { DeleteProxyUseCase } from './delete-proxy/delete-proxy';
+import { CheckProxyUseCase } from './check-proxy/check-proxy';
+
+@Module({
+	providers: [
+		{
+			provide: UseCasesEnum.Start,
+			useClass: StartUseCase,
+		},
+		{
+			provide: UseCasesEnum.ActivateProxy,
+      useClass: ActivateProxyUseCase,
+		},
+
+		{
+			provide: UseCasesEnum.DeleteProxy,
+      useClass: DeleteProxyUseCase,
+		},
+		{
+			provide: UseCasesEnum.CheckProxy,
+      useClass: CheckProxyUseCase,
+		},
+	],
+})
+export class UseCasesModule {}

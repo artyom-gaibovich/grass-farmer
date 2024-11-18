@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiCreateUser, ApiDeleteUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
 import { GrassUserService } from '../../../application/service/grass-user.service';
-import { ApiFindAllUser } from '../../../../../../libs/contracts/src/lib/api.find-all-user';
+import { ApiFindAllUser } from '../../../../../../libs/contracts/src/lib/api/api.find-all-user';
 
 @Controller('grass-account')
 export class GrassAccountController {

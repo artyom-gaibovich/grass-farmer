@@ -1,47 +1,34 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "strictNullChecks": false,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2021",
-    "module": "CommonJS",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "skipLibCheck": true,
-    "strictBindCallApply": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "skipDefaultLibCheck": true,
-    "strictPropertyInitialization": false,
-    "incremental": true,
-    "noImplicitAny": false,
-    "baseUrl": ".",
-    "paths": {
-      "@dynastic-import-monorepository/contracts": [
-        "libs/contracts/src/index.ts"
-      ],
-      "@dynastic-import-monorepository/interfaces": [
-        "libs/interfaces/src/index.ts"
-      ],
-      "@dynastic-import-monorepository/prisma": [
-        "libs/prisma/src/index.ts"
-      ],
-      "@dynastic-import-monorepository/rmq": [
-        "libs/rmq/src/index.ts"
-      ]
-    }
-  },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+	"compileOnSave": false,
+	"compilerOptions": {
+		"rootDir": ".",
+		"sourceMap": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"strictNullChecks": false,
+		"experimentalDecorators": true,
+		"importHelpers": true,
+		"target": "ES2021",
+		"module": "CommonJS",
+		"lib": ["es2020", "dom"],
+		"skipLibCheck": true,
+		"strictBindCallApply": false,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": false,
+		"noFallthroughCasesInSwitch": false,
+		"skipDefaultLibCheck": true,
+		"strictPropertyInitialization": false,
+		"incremental": true,
+		"noImplicitAny": false,
+		"baseUrl": ".",
+		"paths": {
+			"@dynastic-import-monorepository/contracts": ["libs/contracts/src/index.ts"],
+			"@dynastic-import-monorepository/interfaces": ["libs/interfaces/src/index.ts"],
+			"@dynastic-import-monorepository/prisma": ["libs/prisma/src/index.ts"],
+			"@dynastic-import-monorepository/rmq": ["libs/rmq/src/index.ts"],
+			"@grass-farmer/interfaces": ["libs/interfaces/src/index.ts"]
+		}
+	},
+	"exclude": ["node_modules", "tmp"]
 }

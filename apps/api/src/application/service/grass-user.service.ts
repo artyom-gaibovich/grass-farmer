@@ -4,6 +4,7 @@ import { logger } from 'nx/src/utils/logger';
 import { ApiCreateUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
 import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api.find-all-user';
 import { PrismaService } from '../../infra/persistance/prisma/prisma.service';
+import pLimit from 'p-limit';
 
 @Injectable()
 export class GrassUserService {
@@ -130,21 +131,29 @@ export class GrassUserService {
 	}
 
 	public async initializeUsers() {
-		const users = await this.prisma.grassUser.findMany();
-		for (const user of users) {
-			const connections = [];
-			for (const proxy of user.proxies as string[]) {
-				try {
-					const wsConnection = await this.grassConnector.connect(user.id, proxy);
-					connections.push({ proxy, ws: wsConnection });
-				} catch (err) {
-					logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id}`);
-				}
-			}
-			if (connections.length > 0) {
-				this.activeUsers.set(user.id, connections);
-			}
-			await new Promise(resolve => setTimeout(resolve, 240 * 1000));
-		}
+    const users = await this.prisma.grassUser.findMany();
+
+    const limit = pLimit(5); // максимум 5 одновременных подключений
+
+    const connectionPromises = users.map((user) =>
+      limit(async () => {
+        const connections = [];
+        for (const proxy of user.proxies as string[]) {
+          try {
+            const wsConnection = await this.grassConnector.connect(user.user_id, proxy);
+            connections.push({ proxy, ws: wsConnection });
+          } catch (err) {
+            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.user_id}`);
+          }
+        }
+
+        if (connections.length > 0) {
+          this.activeUsers.set(user.user_id, connections);
+          logger.info(`User ${user.user_id} connected with ${connections.length} proxies.`);
+        }
+      })
+    );
+
+    await Promise.all(connectionPromises);
 	}
 }

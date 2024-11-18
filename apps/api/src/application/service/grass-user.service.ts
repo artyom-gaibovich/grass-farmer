@@ -150,24 +150,25 @@ export class GrassUserService {
   }
 
   public async initializeUsers() {
-    const users = await this.prisma.grassUsers.findMany();
+    const users = await this.prisma.grassUser.findMany();
     const limit = pLimit(5);
 
     const connectionPromises = users.map((user) =>
       limit(async () => {
         const connections = [];
-        for (const proxy of user.proxies) {
+        for (const proxy of user.proxies as string[]) {
           try {
-            const wsConnection = await this.retryConnect(user.user_id, proxy);
+            const wsConnection = await this.retryConnect(user.id, proxy);
             connections.push({ proxy, ws: wsConnection });
           } catch (err) {
-            logger.error(`Failed to connect via proxy: ${proxy} for user: ${user.user_id}`);
+            logger.error(`Failed to connect via proxy: ${proxy} for user: ${user.id}`);
           }
         }
 
         if (connections.length > 0) {
-          this.activeUsers.set(user.user_id, connections);
-          logger.info(`User ${user.user_id} connected with ${connections.length} proxies.`);
+          this.activeUsers.set(user.id, connections);
+          logger.info(`User ${user.id
+          } connected with ${connections.length} proxies.`);
         }
       })
     );

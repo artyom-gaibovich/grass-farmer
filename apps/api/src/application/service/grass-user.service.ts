@@ -133,7 +133,7 @@ export class GrassUserService {
 	public async initializeUsers() {
     const users = await this.prisma.grassUser.findMany();
 
-    const limit = pLimit(5); // максимум 5 одновременных подключений
+    const limit = pLimit(1); // максимум 5 одновременных подключений
 
     const connectionPromises = users.map((user) =>
       limit(async () => {

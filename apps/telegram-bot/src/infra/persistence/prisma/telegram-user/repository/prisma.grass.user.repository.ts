@@ -32,4 +32,22 @@ export class PrismaGrassUserRepository implements GrassUserRepository {
 
 	}
 
+  async create(telegramId: number, grassId: string): Promise<string> {
+    try {
+      const result = await this.prismaService.telegramUsersToGrassAccounts.create({
+        data: {
+          telegram_user_id: telegramId,
+          grass_user_id: grassId,
+        }
+      })
+      if (!result) {
+        return null;
+      }
+      return grassId
+    }
+    catch (error) {
+
+    }
+  }
+
 }

@@ -72,7 +72,7 @@ export class ActivateProxyUseCase {
   @AddStep()
   async echo(@Ctx() telegramContext: ActivateProxyContext): Promise<unknown> {
     const { userId, proxies } = telegramContext.scene.state;
-    const msg = await this.grassService.create(userId, proxies)
+    const msg = await this.grassService.create(userId, proxies, telegramContext.from.id)
     await telegramContext.send(`${msg}`);
     return telegramContext.scene.step.next();
   }

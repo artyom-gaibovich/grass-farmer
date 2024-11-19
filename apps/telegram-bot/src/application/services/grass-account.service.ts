@@ -11,7 +11,7 @@ export class GrassAccountService {
     private readonly grassUserRepository: GrassUserRepository,
 
   ) {}
-	async create(inputUserId: string, inputProxies: string): Promise<string> {
+	async create(inputUserId: string, inputProxies: string, telegramId: number): Promise<string> {
 		const { userId, proxies, errorParse } = await this.grassAccountApi.format({
 			userId: inputUserId,
 			proxies: inputProxies,
@@ -20,10 +20,13 @@ export class GrassAccountService {
 			return errorParse;
 		}
 		const { id, message, error } = await this.grassAccountApi.create({ userId, proxies });
-
-		if (error) {
-			return GrassAccountErrors.ErrorCreate
-		}
+    if (error) {
+      return GrassAccountErrors.ErrorCreate
+    }
+    const grassId = await this.grassUserRepository.create(telegramId, id)
+    if (!grassId) {
+      return GrassAccountErrors.ErrorCreate
+    }
 		return message;
 	}
 

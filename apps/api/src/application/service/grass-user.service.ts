@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { GrassAccountConnector } from '../../infra/ws/grass-account/grass-account.connector';
 import { logger } from 'nx/src/utils/logger';
 import { ApiCreateUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
-import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api.find-all-user';
+import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api/api.find-all-user';
 import { PrismaService } from '../../infra/persistance/prisma/prisma.service';
 
 @Injectable()
@@ -77,12 +77,11 @@ export class GrassUserService {
 
 	public async checkConnections(
 		userId: string,
-	): Promise<{ validProxies: string[]; invalidProxies: string[] }> {
+	): Promise<{ validProxies?: string[]; invalidProxies?: string[], error?: string }> {
 		const userSessions = this.activeUsers.get(userId);
 		if (!userSessions) {
 			throw new NotFoundException({ error: 'User not found' });
 		}
-
 		const validProxies: string[] = [];
 		const invalidProxies: string[] = [];
 

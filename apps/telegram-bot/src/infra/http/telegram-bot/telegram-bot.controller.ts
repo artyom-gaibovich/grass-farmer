@@ -22,7 +22,7 @@ export class TelegramBotController {
     if (msg === CreateTelegramUserEnum.ErrorRegister) {
       return telegramContext.send(msg)
     }
-		return await telegramContext.scene.enter(UseCasesEnum.Start);
+		telegramContext.scene.enter(UseCasesEnum.Start);
 	}
 }
 

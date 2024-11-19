@@ -29,7 +29,7 @@ export class StartUseCase {
   async zeroStep(@Ctx() telegramContext: StartContext) {
     const {activated} = telegramContext.scene.state
     if (telegramContext.scene.step.firstTime) {
-      return telegramContext.send(!activated ? UseCasesEnum.HelloMsg : UseCasesEnum.Choose , {
+      return await telegramContext.send(!activated ? UseCasesEnum.HelloMsg : UseCasesEnum.Choose , {
         reply_markup: {
           resize_keyboard: true,
           remove_keyboard: true,
@@ -41,13 +41,13 @@ export class StartUseCase {
       });
     }
     if (telegramContext.text === UseCasesEnum.ActivateProxy) {
-      return telegramContext.scene.enter(UseCasesEnum.ActivateProxy);
+      return await telegramContext.scene.enter(UseCasesEnum.ActivateProxy);
     }
     if (telegramContext.text === UseCasesEnum.DeleteProxy) {
-      return telegramContext.scene.enter(UseCasesEnum.DeleteProxy);
+      return await  telegramContext.scene.enter(UseCasesEnum.DeleteProxy);
     }
     if (telegramContext.text === UseCasesEnum.CheckProxy) {
-      return telegramContext.scene.enter(UseCasesEnum.CheckProxy);
+      return await  telegramContext.scene.enter(UseCasesEnum.CheckProxy);
     }
     if (telegramContext.text === UseCasesEnum.CheckAllProxies) {
       return await telegramContext.send(await this.grassAccountService.findProxies(telegramContext.from.id))

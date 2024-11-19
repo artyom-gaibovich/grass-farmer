@@ -1,43 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { TelegramUserRepository } from '../../../../../application/repository/telegram-user-repository';
-import { TelegramUserEntity } from '../../../../../domain/telegram-user';
-import * as inspector from 'node:inspector';
+import { GrassUserRepository } from '../../../../../application/repository/grass-user.repository';
+import { GrassUserEntity } from '../../../../../domain/grass-user';
 
 @Injectable()
-export class PrismaTelegramUserRepository implements TelegramUserRepository  {
-	constructor(
-    private prismaService: PrismaService) {}
+export class PrismaGrassUserRepository implements GrassUserRepository {
+	constructor(private prismaService: PrismaService) {}
 
-  async create(buffMT: TelegramUserEntity): Promise<TelegramUserEntity> {
-    try {
-      const {id} = buffMT;
-      const user = await this.prismaService.telegramUser.create({
-        data: {
-          id: id,
-        }
-      })
-      return new TelegramUserEntity({
-        id: id,
-      })
-    }
-    catch (error) {
-      return null
-    }
-  }
 
-  async find(id: number): Promise<TelegramUserEntity> {
+	async findMany(telegramId: number): Promise<GrassUserEntity[]> {
     try {
-      const user = await this.prismaService.telegramUser.findUnique({ where: { id: id } });
-      if (user) {
-        return new TelegramUserEntity({
-          id: user.id as unknown as number,
-        });
+      const grasses = await this.prismaService.telegramUsersToGrassAccounts.findMany({
+        where: {
+          telegram_user_id: telegramId,
+        },
+      });
+      if (grasses.length === 0) {
+        return null;
       }
-      return null
+      return grasses.map(
+        (el) =>
+          new GrassUserEntity({
+            id: el.grass_user_id,
+          }),
+      );
+
     }
     catch (error) {
-      return null
+      return null;
     }
-  }
+
+	}
+
 }

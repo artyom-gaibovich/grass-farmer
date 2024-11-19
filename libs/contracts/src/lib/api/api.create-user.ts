@@ -16,6 +16,10 @@ export namespace ApiCreateUser {
 	}
 
 	export class Response {
+
+    @IsString()
+    id? : string;
+
 		@IsString()
 		@IsOptional()
 		message?: string;

@@ -44,7 +44,7 @@ export class GrassUserService {
 				update: { proxies },
 				create: { id: userId, proxies },
 			});
-			return { message: `User ${userId} added with ${connections.length} proxies.` };
+			return { userId: userId, message: `User ${userId} added with ${connections.length} proxies.` };
 		} else {
 			throw new BadRequestException({
 				error: 'Failed to connect with provided proxies.',

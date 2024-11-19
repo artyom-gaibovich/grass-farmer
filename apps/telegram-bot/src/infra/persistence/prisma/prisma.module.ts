@@ -1,66 +1,22 @@
 import { Module } from '@nestjs/common';
-import { YMarkerRepository } from '../../../application/y-science/ports/y-marker/y-marker-repository';
 import { PrismaService } from './prisma.service';
-import { PrismaYMarkerRepository } from './y-science/repostiroies/prisma-y-marker.repository';
-import { PrismaBuffMigrator } from './migrator/prisma-buff-migrator';
-import { YBuffManager } from '../../../application/y-science/ports/y-buff/y-buff-manager';
-import { PrismaYBuffManager } from './y-science/managers/prisma-y-buff.manager';
-import { YBuffRepository } from '../../../application/y-science/ports/y-buff/y-buff-repository';
-import { PrismaYBuffRepository } from './y-science/repostiroies/prisma-y-buff.repository';
-import { YBuffToMarkerManager } from '../../../application/y-science/ports/y-buff-to-marker/y-buff-to-marker.manager';
-import { PrismaYBuffToMarkerManager } from './y-science/managers/prisma-y-buff-to-marker.manager';
-import { MtBuffManager } from '../../../application/mt-science/ports/mt-buff.manager';
-import { PrismaMtBuffManager } from './mt-scinece/manager/primsa-mt-buff.manager';
-import { MtBuffVarManager } from '../../../application/mt-science/ports/mt-buff-var.manager';
-import { PrismaMtBuffVarManager } from './mt-scinece/manager/prisma-mt-buff-var.manager';
-import { PrismaFtdnaProjectManager } from './ftdna/manager/prisma.ftdna-project.manager';
-import { FTDnaProjectManager } from '../../../application/ftdna/ports/ftdna-project.manager';
+import { TelegramUserRepository } from '../../../application/repository/telegram-user-repository';
+import { PrismaTelegramUserRepository } from './telegram-user/repository/prisma.telegram.user.repository';
+import { GrassUserRepository } from '../../../application/repository/grass-user.repository';
+import { PrismaGrassUserRepository } from './telegram-user/repository/prisma.grass.user.repository';
+
 @Module({
 	providers: [
 		PrismaService,
 		{
-			provide: YMarkerRepository,
-			useClass: PrismaYMarkerRepository,
-		},
-		{
-			provide: PrismaBuffMigrator,
-			useClass: PrismaBuffMigrator,
-		},
-		{
-			provide: YBuffManager,
-			useClass: PrismaYBuffManager,
-		},
-		{
-			provide: YBuffRepository,
-			useClass: PrismaYBuffRepository,
-		},
-		{
-			provide: YBuffToMarkerManager,
-			useClass: PrismaYBuffToMarkerManager,
-		},
-		{
-			provide: MtBuffManager,
-			useClass: PrismaMtBuffManager,
-		},
-		{
-			provide: MtBuffVarManager,
-			useClass: PrismaMtBuffVarManager,
+			provide: TelegramUserRepository,
+			useClass: PrismaTelegramUserRepository,
 		},
     {
-      provide: FTDnaProjectManager,
-      useClass: PrismaFtdnaProjectManager,
+      provide: GrassUserRepository,
+      useClass: PrismaGrassUserRepository,
     },
 	],
-	exports: [
-		PrismaService,
-		YMarkerRepository,
-		PrismaBuffMigrator,
-		YBuffManager,
-		YBuffRepository,
-		YBuffToMarkerManager,
-		MtBuffManager,
-		MtBuffVarManager,
-    FTDnaProjectManager
-	],
+	exports: [PrismaService, TelegramUserRepository, GrassUserRepository],
 })
 export class PrismaModule {}

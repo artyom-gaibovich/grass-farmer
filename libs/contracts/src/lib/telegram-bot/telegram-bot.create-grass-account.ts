@@ -1,11 +1,10 @@
-export namespace TelegramBotCreateTelegramUser {
+export namespace TelegramBotCreateGrassAccount {
 	export class Request {
-		id: bigint;
+		userId: string;
+    proxies: string[];
 	}
 
 	export class Response {
 		id: number;
-		createdAt?: Date;
-		updatedAt?: Date;
 	}
 }

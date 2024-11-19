@@ -1,20 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { GrassAccountApi } from '../../infra/api/grass-account.api';
+import { GrassAccountErrors } from './grass-account.service.enum';
+import { GrassUserRepository } from '../repository/grass-user.repository';
+import { GrassUserEntity } from '../../domain/grass-user';
 
 @Injectable()
 export class GrassAccountService {
-	constructor(private readonly grassAccountApi: GrassAccountApi) {}
+	constructor(
+    private readonly grassAccountApi: GrassAccountApi,
+    private readonly grassUserRepository: GrassUserRepository,
+
+  ) {}
 	async create(inputUserId: string, inputProxies: string): Promise<string> {
 		const { userId, proxies, errorParse } = await this.grassAccountApi.format({
 			userId: inputUserId,
 			proxies: inputProxies,
 		});
 		if (errorParse) {
-			return 'Произошла ошибка при форматировании';
+			return errorParse;
 		}
-		const { message, error } = await this.grassAccountApi.create({ userId, proxies });
+		const { id, message, error } = await this.grassAccountApi.create({ userId, proxies });
+
 		if (error) {
-			return 'Произошла ошибка при создании';
+			return GrassAccountErrors.ErrorCreate
 		}
 		return message;
 	}
@@ -40,4 +48,18 @@ export class GrassAccountService {
 		const invalidMsg = `Количество невалидных: ${invalidProxies}`;
 		return `${validMsg}\n${invalidMsg}`;
 	}
+
+  async findProxies(telegramId: number): Promise<string> {
+    const proxies = await this.grassUserRepository.findMany(telegramId);
+
+    if (!proxies || proxies.length === 0) {
+      return "Не найдено ни одного прокси:(.";
+    }
+
+    const msg = proxies
+      .map((el, index) => `${index + 1}. Userid ID: ${el.id}`)
+      .join('\n');
+    return msg;
+
+  }
 }

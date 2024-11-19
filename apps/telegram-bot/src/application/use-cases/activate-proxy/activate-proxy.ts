@@ -34,6 +34,7 @@ export class ActivateProxyUseCase {
 
   @SceneEnter()
   async sceneEnter() {
+    console.log()
   }
 
   @SceneLeave()

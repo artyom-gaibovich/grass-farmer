@@ -1,8 +1,11 @@
-export namespace ApiFindAllUser {
+export namespace ApiCheckProxy {
 	export class Request {
+    userId: string;
 	}
 
 	export class Response {
-		message: string[]
+    validProxies?: string[]
+    invalidProxies?: string[]
+    error?: string
 	}
 }

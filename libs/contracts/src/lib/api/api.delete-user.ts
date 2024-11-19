@@ -1,7 +1,10 @@
 export namespace ApiDeleteUser {
-	export class Request {}
+	export class Request {
+    userId: string;
+  }
 
 	export class Response {
-		message: string;
+    message?: string;
+    error?: string;
 	}
 }

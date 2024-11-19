@@ -1,9 +1,14 @@
 export namespace ApiParseUserProxy {
-	export class Request {}
+	export class Request {
+    userId?: string;
+    proxies?: string;
+  }
 
 	export class Response {
-		userId: string;
+		userId?: string;
 
-    proxies: string[];
+    proxies?: string[];
+
+    errorParse?: string
 	}
 }

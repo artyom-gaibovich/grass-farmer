@@ -24,3 +24,4 @@ model GrassUser {
   @@map("grass_users")
   @@schema("grass")
 }
+

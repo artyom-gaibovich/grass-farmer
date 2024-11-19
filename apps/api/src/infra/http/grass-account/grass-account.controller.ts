@@ -1,5 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
-import { ApiCreateUser, ApiDeleteUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
+import {
+  ApiCheckProxy,
+  ApiCreateUser,
+  ApiDeleteUser,
+  ApiParseUserProxy,
+} from '@dynastic-import-monorepository/contracts';
 import { GrassUserService } from '../../../application/service/grass-user.service';
 import { ApiFindAllUser } from '../../../../../../libs/contracts/src/lib/api/api.find-all-user';
 
@@ -36,7 +41,7 @@ export class GrassAccountController {
 	}
 
 	@Get(':userId/check-proxy')
-	async checkUserConnections(@Param('userId') userId: string) {
+	async checkUserConnections(@Param('userId') userId: string): Promise<ApiCheckProxy.Response> {
 		return await this.grassUserService.checkConnections(userId);
 	}
 }

@@ -77,12 +77,11 @@ export class GrassUserService {
 
 	public async checkConnections(
 		userId: string,
-	): Promise<{ validProxies: string[]; invalidProxies: string[] }> {
+	): Promise<{ validProxies?: string[]; invalidProxies?: string[], error?: string }> {
 		const userSessions = this.activeUsers.get(userId);
 		if (!userSessions) {
 			throw new NotFoundException({ error: 'User not found' });
 		}
-
 		const validProxies: string[] = [];
 		const invalidProxies: string[] = [];
 

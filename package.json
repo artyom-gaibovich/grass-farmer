@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:inspect:api": "nodemon -e ts,json --inspect=localhost:9222 -r ts-node/register -r tsconfig-paths/register --project tsconfig.base.json /apps/y-mt-import/src/main.ts"
+    "dev:inspect:api": "nodemon -e ts,json --inspect=localhost:9222 -r ts-node/register -r tsconfig-paths/register --project tsconfig.base.json /apps/y-mt-import/src/main.ts",
+    "dev:inspect:bot": "nodemon -e ts,json --inspect=localhost:9222 -r ts-node/register -r tsconfig-paths/register --project tsconfig.base.json /apps/y-mt-import/src/main.ts"
   },
   "private": true,
   "dependencies": {

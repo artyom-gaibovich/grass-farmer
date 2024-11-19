@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TelegramBotController } from '../../infra/http/telegram-bot/telegram-bot.controller';
 import { UseCasesEnum } from './use-cases.enum';
 import { StartUseCase } from './start/start';
-import { ActivateProxyUseCase } from './activate-proxy/activate-proxy';
 import { DeleteProxyUseCase } from './delete-proxy/delete-proxy';
 import { CheckProxyUseCase } from './check-proxy/check-proxy';
+import { ActivateProxyUseCase } from './activate-proxy/activate-proxy';
+import { ServicesModule } from '../services/services.module';
 
 @Module({
+  imports: [ServicesModule],
 	providers: [
 		{
 			provide: UseCasesEnum.Start,
@@ -14,16 +15,16 @@ import { CheckProxyUseCase } from './check-proxy/check-proxy';
 		},
 		{
 			provide: UseCasesEnum.ActivateProxy,
-      useClass: ActivateProxyUseCase,
+			useClass: ActivateProxyUseCase,
 		},
 
 		{
 			provide: UseCasesEnum.DeleteProxy,
-      useClass: DeleteProxyUseCase,
+			useClass: DeleteProxyUseCase,
 		},
 		{
 			provide: UseCasesEnum.CheckProxy,
-      useClass: CheckProxyUseCase,
+			useClass: CheckProxyUseCase,
 		},
 	],
 })

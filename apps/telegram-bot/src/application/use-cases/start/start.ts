@@ -1,12 +1,11 @@
 import { AddStep, Ctx, Scene, SceneEnter } from 'nestjs-puregram';
 import { UseCasesEnum } from '../use-cases.enum';
 import { TelegramContextModel } from '@grass-farmer/interfaces';
-import {StepContext} from "@puregram/scenes";
-
-
+import { StepContext } from '@puregram/scenes';
 
 export interface StartInterface extends Record<string, any> {
-  activateCode: string;
+	activateCode: string;
+	activated: boolean;
 }
 
 export type StartContext = TelegramContextModel & StepContext<StartInterface>;
@@ -22,8 +21,9 @@ export class StartUseCase {
 
   @AddStep(0)
   async zeroStep(@Ctx() telegramContext: StartContext) {
+    const {activated} = telegramContext.scene.state
     if (telegramContext.scene.step.firstTime) {
-      return await telegramContext.send(UseCasesEnum.HelloMsg, {
+      return await telegramContext.send(!activated ? UseCasesEnum.HelloMsg : UseCasesEnum.Choose , {
         reply_markup: {
           resize_keyboard: true,
           remove_keyboard: true,

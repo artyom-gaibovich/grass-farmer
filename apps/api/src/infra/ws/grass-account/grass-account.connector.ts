@@ -43,7 +43,6 @@ export class GrassAccountConnector {
     ws.on('message', (data: string) => {
       const message = JSON.parse(data);
       logger.info(`Message received for user: ${userId}:${message}`);
-
       if (message.action === "AUTH") {
         const authResponse = {
           id: message.id,

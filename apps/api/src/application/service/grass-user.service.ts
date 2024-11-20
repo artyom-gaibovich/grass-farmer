@@ -4,6 +4,7 @@ import { logger } from 'nx/src/utils/logger';
 import { ApiCreateUser, ApiParseUserProxy } from '@dynastic-import-monorepository/contracts';
 import { ApiFindAllUser } from '../../../../../libs/contracts/src/lib/api/api.find-all-user';
 import { PrismaService } from '../../infra/persistance/prisma/prisma.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class GrassUserService {
@@ -77,7 +78,7 @@ export class GrassUserService {
 
 	public async checkConnections(
 		userId: string,
-	): Promise<{ validProxies?: string[]; invalidProxies?: string[], error?: string }> {
+	): Promise<{ validProxies?: string[]; invalidProxies?: string[]; error?: string }> {
 		const userSessions = this.activeUsers.get(userId);
 		if (!userSessions) {
 			throw new NotFoundException({ error: 'User not found' });
@@ -128,11 +129,8 @@ export class GrassUserService {
 		};
 	}
 
-	public async initializeUsers() {
-
-		const users = (await this.prisma.grassUser.findMany())
-    console.log(users)
-
+	public async initializeUsersOld() {
+		const users = await this.prisma.grassUser.findMany();
 		for (const user of users) {
 			const connections = [];
 			for (const proxy of user.proxies as string[]) {
@@ -148,4 +146,33 @@ export class GrassUserService {
 			}
 		}
 	}
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async initializeUsers() {
+    logger.info('Initializing users...');
+    this.activeUsers.clear();
+    const users = await this.prisma.grassUser.findMany();
+
+    for (const [index, user] of users.entries()) {
+      setTimeout(async () => {
+        const connections = [];
+        for (const proxy of user.proxies as string[]) {
+          try {
+            const wsConnection = await this.grassConnector.connect(user.id, proxy);
+            connections.push({ proxy, ws: wsConnection });
+          } catch (err) {
+            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id}`);
+          }
+        }
+        if (connections.length > 0) {
+          this.activeUsers.set(user.id, connections);
+        }
+        logger.info(`User ${user.id} initialization completed.`);
+      }, index * 60000);
+    }
+
+    logger.info('Users initialization started with delays.');
+  }
+
+
 }

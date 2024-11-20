@@ -6,9 +6,11 @@ import { ServiceModule } from './application/service/service.module';
 import { RepositoryModule } from './application/repository/repository.module';
 import { PersistenceModule } from './infra/persistance/persistence.module';
 import { GrassUserService } from './application/service/grass-user.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
+    ScheduleModule.forRoot(),
 		HttpModule,
 		WsModule,
 		ServiceModule,

@@ -1,12 +1,9 @@
 
-
-
+all:
+	npx nx run-many --parallel=10 --target=serve
 
 create-migration:
 	npx prisma migrate dev --create-only
-
-
-
 
 COMPOSE_FILE=docker-compose.yml
 

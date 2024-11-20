@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
@@ -16,12 +10,40 @@ datasource db {
 }
 
 model GrassUser {
-  id          String    @id
-  proxies Json @db.JsonB
-  created_at  DateTime? @default(now())
-  updated_at  DateTime?
+  id                           String                         @id
+  proxies                      Json                           @db.JsonB
+  created_at                   DateTime?                      @default(now())
+  updated_at                   DateTime?
+  TelegramUsersToGrassAccounts TelegramUsersToGrassAccounts[]
 
   @@map("grass_users")
   @@schema("grass")
 }
 
+model TelegramUser {
+  id                           BigInt                         @id
+  created_at                   DateTime?                      @default(now())
+  updated_at                   DateTime?
+
+  limit Int @db.Integer @default(10)
+
+  TelegramUsersToGrassAccounts TelegramUsersToGrassAccounts[]
+
+  @@map("telegram_user")
+  @@schema("grass")
+}
+
+model TelegramUsersToGrassAccounts {
+  telegram_user_id BigInt
+  grass_user_id    String
+
+  TelegramUser TelegramUser @relation(fields: [telegram_user_id], references: [id], onDelete: Cascade)
+  GrassUser    GrassUser    @relation(fields: [grass_user_id], references: [id], onDelete: Cascade)
+
+  created  DateTime? @default(now())
+  modified DateTime?
+
+  @@id([telegram_user_id, grass_user_id])
+  @@map("telegram_users_to_grass_accounts")
+  @@schema("grass")
+}

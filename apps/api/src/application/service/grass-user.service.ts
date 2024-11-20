@@ -44,7 +44,7 @@ export class GrassUserService {
 				update: { proxies },
 				create: { id: userId, proxies },
 			});
-			return { message: `User ${userId} added with ${connections.length} proxies.` };
+			return { id: userId, message: `User ${userId} added with ${connections.length} proxies.` };
 		} else {
 			throw new BadRequestException({
 				error: 'Failed to connect with provided proxies.',
@@ -129,7 +129,10 @@ export class GrassUserService {
 	}
 
 	public async initializeUsers() {
-		const users = (await this.prisma.grassUser.findMany()).filter(el=>el.id === '2ohcOFSabTU04uKbavf9a40i3IJ');
+
+		const users = (await this.prisma.grassUser.findMany())
+    console.log(users)
+
 		for (const user of users) {
 			const connections = [];
 			for (const proxy of user.proxies as string[]) {

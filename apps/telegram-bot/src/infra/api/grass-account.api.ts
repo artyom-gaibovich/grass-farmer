@@ -31,7 +31,7 @@ export class GrassAccountApi {
       return {
         userId: '',
         proxies: [],
-        errorParse: 'Ошибка при форматировании'
+        errorParse: 'Ошибка на стороне сервера(ручка форматирования)'
       };
     }
 	}

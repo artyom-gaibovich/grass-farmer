@@ -33,7 +33,16 @@ export class ActivateProxyUseCase {
   }
 
   @SceneEnter()
-  async sceneEnter() {
+  async sceneEnter(@Ctx() context: ActivateProxyContext) {
+    if (context.scene.step.firstTime || !context.hasText) {
+      const { currentProxyLength, limit } = await this.grassService.findProxyLim(context.from.id);
+      if (currentProxyLength === limit) {
+        await context.send(`Вы пресивысили лимит по прокси`);
+        context.scene.leave();
+      }
+    }
+
+
   }
 
   @SceneLeave()
@@ -71,7 +80,7 @@ export class ActivateProxyUseCase {
   @AddStep()
   async echo(@Ctx() telegramContext: ActivateProxyContext): Promise<unknown> {
     const { userId, proxies } = telegramContext.scene.state;
-    const msg = await this.grassService.create(userId, proxies)
+    const msg = await this.grassService.create(userId, proxies, telegramContext.from.id)
     await telegramContext.send(`${msg}`);
     return telegramContext.scene.step.next();
   }

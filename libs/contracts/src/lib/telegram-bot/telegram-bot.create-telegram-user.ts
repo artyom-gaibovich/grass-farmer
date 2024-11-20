@@ -5,6 +5,8 @@ import {
 export namespace TelegramBotCreateTelegramUser {
 	export class Request {
 		id: number;
+
+    limit: number;
 	}
 
 	export class Response {

@@ -24,6 +24,9 @@ model TelegramUser {
   id                           BigInt                         @id
   created_at                   DateTime?                      @default(now())
   updated_at                   DateTime?
+
+  limit Int @db.Integer @default(10)
+
   TelegramUsersToGrassAccounts TelegramUsersToGrassAccounts[]
 
   @@map("telegram_user")

@@ -33,8 +33,16 @@ export class ActivateProxyUseCase {
   }
 
   @SceneEnter()
-  async sceneEnter() {
-    console.log()
+  async sceneEnter(@Ctx() context: ActivateProxyContext) {
+    if (context.scene.step.firstTime || !context.hasText) {
+      const { currentProxyLength, limit } = await this.grassService.findProxyLim(context.from.id);
+      if (currentProxyLength === limit) {
+        await context.send(`Вы пресивысили лимит по прокси`);
+        context.scene.leave();
+      }
+    }
+
+
   }
 
   @SceneLeave()

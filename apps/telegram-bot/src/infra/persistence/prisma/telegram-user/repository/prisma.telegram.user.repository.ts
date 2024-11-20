@@ -19,6 +19,7 @@ export class PrismaTelegramUserRepository implements TelegramUserRepository  {
       })
       return new TelegramUserEntity({
         id: id,
+        limit: buffMT.limit,
       })
     }
     catch (error) {
@@ -32,6 +33,7 @@ export class PrismaTelegramUserRepository implements TelegramUserRepository  {
       if (user) {
         return new TelegramUserEntity({
           id: user.id as unknown as number,
+          limit: user.limit
         });
       }
       return null

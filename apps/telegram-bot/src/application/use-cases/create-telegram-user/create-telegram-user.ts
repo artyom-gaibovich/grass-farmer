@@ -11,15 +11,16 @@ export class CreateTelegramUserUseCase {
 	async create(
 		request: TelegramBotCreateTelegramUser.Request,
 	): Promise<TelegramBotCreateTelegramUser.Response> {
-    const existedUser = await this.telegramUserRepository.find(request.id)
-    if (existedUser) {
-      return {
-        msg: CreateTelegramUserEnum.AlreadyExisted,
-      };
-    }
+		const existedUser = await this.telegramUserRepository.find(request.id);
+		if (existedUser) {
+			return {
+				msg: CreateTelegramUserEnum.AlreadyExisted,
+			};
+		}
 		const telegramUser = await this.telegramUserRepository.create(
 			new TelegramUserEntity({
 				id: request.id,
+        limit: request.limit,
 			}),
 		);
 		if (!telegramUser) {

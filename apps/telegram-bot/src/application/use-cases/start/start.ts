@@ -20,7 +20,7 @@ export class StartUseCase {
 
   @SceneEnter()
   async sceneEnter() {
-
+    console.log()
   }
 
 

@@ -129,7 +129,10 @@ export class GrassUserService {
 	}
 
 	public async initializeUsers() {
-		const users = (await this.prisma.grassUser.findMany()).filter(el=>el.id === '2ohcOFSabTU04uKbavf9a40i3IJ');
+
+		const users = (await this.prisma.grassUser.findMany())
+    console.log(users)
+
 		for (const user of users) {
 			const connections = [];
 			for (const proxy of user.proxies as string[]) {

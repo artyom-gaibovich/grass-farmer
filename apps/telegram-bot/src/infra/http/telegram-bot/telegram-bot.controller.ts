@@ -8,21 +8,18 @@ import { CreateTelegramUserEnum } from '../../../application/use-cases/create-te
 @Update()
 @Injectable()
 export class TelegramBotController {
-  constructor(private createTelegramUserUseCase:  CreateTelegramUserUseCase) {
-  }
+	constructor(private createTelegramUserUseCase: CreateTelegramUserUseCase) {}
+
 	@Hears('/start')
 	async start(@Ctx() telegramContext: TelegramContextModel): Promise<unknown> {
-    const id = telegramContext.from.id;
-    const {msg} = await this.createTelegramUserUseCase.create({
-      id: id
-    })
-/*    if (msg === CreateTelegramUserEnum.AlreadyExisted) {
-      return telegramContext.send(msg)
-    }*/
-    if (msg === CreateTelegramUserEnum.ErrorRegister) {
-      return telegramContext.send(msg)
-    }
+		const id = telegramContext.from.id;
+		const { msg } = await this.createTelegramUserUseCase.create({
+			id: id,
+			limit: 10,
+		});
+		if (msg === CreateTelegramUserEnum.ErrorRegister) {
+			return telegramContext.send(msg);
+		}
 		await telegramContext.scene.enter(UseCasesEnum.Start);
 	}
 }
-

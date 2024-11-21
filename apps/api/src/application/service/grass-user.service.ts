@@ -148,7 +148,7 @@ export class GrassUserService {
 	}
 
   @Cron(CronExpression.EVERY_4_HOURS)
-  async initializeUsers() {
+  async oldXinitializeUsers() {
     logger.info('Initializing users...');
     this.activeUsers.clear();
     const users = await this.prisma.grassUser.findMany();
@@ -174,5 +174,33 @@ export class GrassUserService {
     logger.info('Users initialization started with delays.');
   }
 
+  @Cron(CronExpression.EVERY_4_HOURS)
+  async initializeUsers() {
+    let userCounter = 0; // Счётчик пользователей
+    for (const [index, user] of this.activeUsers.entries()) {
+      setTimeout(async () => {
+        const connections = [];
+        for (const proxy of user.proxies as string[]) {
+          try {
+            const wsConnection = await this.grassConnector.connect(user.id, proxy);
+            connections.push({ proxy, ws: wsConnection });
+          } catch (err) {
+            logger.error(`Failed to reconnect via proxy: ${proxy} for user: ${user.id}`);
+          }
+        }
+        if (connections.length > 0) {
+          this.activeUsers.set(user.id, connections);
+        }
+        logger.info(`User ${user.id} initialization completed.`);
+      }, index * 60000 + Math.floor(index / 1000) * 60000);
+
+      userCounter++;
+
+      if (userCounter === 1000) {
+        userCounter = 0;
+      }
+    }
+
+  }
 
 }

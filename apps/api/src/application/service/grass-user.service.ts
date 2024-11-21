@@ -147,7 +147,7 @@ export class GrassUserService {
 		}
 	}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_4_HOURS)
   async initializeUsers() {
     logger.info('Initializing users...');
     this.activeUsers.clear();

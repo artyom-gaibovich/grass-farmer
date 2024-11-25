@@ -7,6 +7,7 @@ import {
 } from '@dynastic-import-monorepository/contracts';
 import { GrassUserService } from '../../../application/service/grass-user.service';
 import { ApiFindAllUser } from '../../../../../../libs/contracts/src/lib/api/api.find-all-user';
+import { ApiParseAndCreateProxy } from '../../../../../../libs/contracts/src/lib/api/api.parse-and-create-proxy';
 
 @Controller('grass-account')
 export class GrassAccountController {
@@ -23,7 +24,15 @@ export class GrassAccountController {
 		return await this.grassUserService.parseProxies(body, userId);
 	}
 
-	@Post()
+
+  @Post('parse-and-create/:userId')
+  public async sendProxies(@Param('userId') id: string, @Body() body: string, @Req() req: any): Promise<ApiParseAndCreateProxy.Response> {
+    const {proxies, userId} = await this.grassUserService.parseProxies(body, id);
+    return await this.grassUserService.create(userId, proxies);
+  }
+
+
+  @Post()
 	public async create(
 		@Body() { userId, proxies }: ApiCreateUser.Request,
 	): Promise<ApiCreateUser.Response> {
